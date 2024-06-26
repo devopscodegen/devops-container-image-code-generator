@@ -60,6 +60,7 @@ def runnable_fnd_lang_dep_mfst_dep_mgmt_tool(text: str):
         "dependency_manifest_content": git_source_code_repository.get_dependency_manifest_content(),
     }
 
+
 llm = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
@@ -69,7 +70,7 @@ llm = ChatOpenAI(
 )
 
 find_middleware_chain = {}
-find_middleware_chain['java'] = {}
+find_middleware_chain["java"] = {}
 find_middleware_chain["java"]["apache_maven"] = (
     ChatPromptTemplate.from_messages(
         [
@@ -131,7 +132,7 @@ generate_container_image_code_chain["java"]["apache_maven"][
                 "human",
                 """{dependency_manifest_content}
 
-For above {dependency_manifest}, use the below Dockerfile template to generate the Dockerfile. 
+For above {dependency_manifest}, use the below Dockerfile template to generate the Dockerfile.
 Make the changes required by the {dependency_manifest}. Generate the Dockerfile and nothing else.
 
 FROM eclipse-temurin:21-jdk-jammy as extract
@@ -226,6 +227,8 @@ def route_to_generate_container_image_code_chain(info):
 
 chain = (
     RunnableLambda(runnable_fnd_lang_dep_mfst_dep_mgmt_tool)
-    | RunnablePassthrough.assign(middleware = RunnableLambda(route_to_find_middleware_chain))
+    | RunnablePassthrough.assign(
+        middleware=RunnableLambda(route_to_find_middleware_chain)
+    )
     | RunnableLambda(route_to_generate_container_image_code_chain)
 )
