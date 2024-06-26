@@ -55,7 +55,7 @@ This will start the FastAPI app with a server is running locally at
 [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 We can see all templates at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-We can access the playground at [http://127.0.0.1:8000/devops-container-image-code-generator/playground](http://127.0.0.1:8000/devops-container-image-code-generator/playground)
+We can access the playground at [http://127.0.0.1:8000/playground](http://127.0.0.1:8000/playground)
 
 We can access the template from code with:
 
