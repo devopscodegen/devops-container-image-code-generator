@@ -5,7 +5,7 @@ This module exposes the chain using langserve fastapi server
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from langserve import add_routes
-from langchain_template_devops_container_image_code_generator.chain import (
+from devops_container_image_code_generator.chain import (
     chain as devops_container_image_code_generator_chain,
 )
 
