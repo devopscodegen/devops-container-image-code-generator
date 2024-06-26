@@ -31,6 +31,10 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 langchain-cli = ">=0.0.15"
+pre-commit = "^3.7.1"
+pytest = "^8.2.2"
+black = "^24.4.2"
+pylint = "^3.2.3"
 
 [build-system]
 requires = ["poetry-core"]
