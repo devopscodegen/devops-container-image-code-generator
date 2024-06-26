@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "devops-container-image-code-generator"
+version = "1.20240626.1"
+description = "Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint shell script using LangChain GenAI. "
+authors = ["Sagar Velankar <sagar.velankar@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/devops-code-generators/devops-container-image-code-generator"
+repository = "https://github.com/devops-code-generators/devops-container-image-code-generator"
+documentation = "https://github.com/devops-code-generators/devops-container-image-code-generator"
+keywords = ["devops", "container-image-code-generator", "devops-platform", "langchain", "genai"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Code Generators",
+]
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = "^0.23.2"
+langserve = {extras = ["server"], version = ">=0.0.30"}
+pydantic = "<2"
+langchain-template-devops-container-image-code-generator = {path = "packages/langchain-template-devops-container-image-code-generator", develop = true}
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+langchain-cli = ">=0.0.15"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
