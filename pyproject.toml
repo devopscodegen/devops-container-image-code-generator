@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devops-container-image-code-generator"
-version = "1.20240626.7"
+version = "1.20240702.1"
 description = "Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint shell script using LangChain GenAI. "
 authors = ["Sagar Velankar <sagar.velankar@gmail.com>"]
 license = "MIT"
@@ -15,15 +15,34 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Code Generators",
 ]
+packages = [
+    { include = "app" },
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 uvicorn = "^0.23.2"
 langserve = {extras = ["server"], version = ">=0.0.30"}
 pydantic = "<2"
 langchain-core = ">=0.1.5,<0.3"
 langchain-openai = ">=0.0.1"
 devops-code-generator = ">=1.0.0,<2.0.0"
+opentelemetry-distro = "^0.46b0"
+opentelemetry-exporter-otlp = "^1.25.0"
+opentelemetry-instrumentation-asyncio = "^0.46b0"
+opentelemetry-instrumentation-aws-lambda = "^0.46b0"
+opentelemetry-instrumentation-dbapi = "^0.46b0"
+opentelemetry-instrumentation-logging = "^0.46b0"
+opentelemetry-instrumentation-sqlite3 = "^0.46b0"
+opentelemetry-instrumentation-threading = "^0.46b0"
+opentelemetry-instrumentation-urllib = "^0.46b0"
+opentelemetry-instrumentation-wsgi = "^0.46b0"
+opentelemetry-instrumentation-fastapi = "^0.46b0"
+opentelemetry-instrumentation-grpc = "^0.46b0"
+opentelemetry-instrumentation-httpx = "^0.46b0"
+opentelemetry-instrumentation-requests = "^0.46b0"
+opentelemetry-instrumentation-tortoiseorm = "^0.46b0"
+opentelemetry-instrumentation-urllib3 = "^0.46b0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -34,10 +53,6 @@ pre-commit = "^3.7.1"
 pytest = "^8.2.2"
 black = "^24.4.2"
 pylint = "^3.2.3"
-
-[tool.langserve]
-export_module = "devops_container_image_code_generator.chain"
-export_attr = "chain"
 
 [build-system]
 requires = ["poetry-core"]

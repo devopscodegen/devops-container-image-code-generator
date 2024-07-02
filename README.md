@@ -64,3 +64,48 @@ from langserve.client import RemoteRunnable
 
 runnable = RemoteRunnable("http://127.0.0.1:8000")
 ```
+
+## Opentelemetry
+
+### Workaround for Opentelemetry autoinstrumentation to work with uvicorn
+https://github.com/open-telemetry/opentelemetry-python-contrib/issues/385#issuecomment-808794045
+
+Add below code as first line after documentation in the function subprocess_started in file site-packages/uvicorn/_subprocess.py
+```
+from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
+```
+For Example :
+```
+def subprocess_started(
+    config: Config,
+    target: Callable[..., None],
+    sockets: List[socket],
+    stdin_fileno: Optional[int],
+) -> None:
+    """
+    Called when the child process starts.
+
+    * config - The Uvicorn configuration instance.
+    * target - A callable that accepts a list of sockets. In practice this will
+               be the `Server.run()` method.
+    * sockets - A list of sockets to pass to the server. Sockets are bound once
+                by the parent process, and then passed to the child processes.
+    * stdin_fileno - The file number of sys.stdin, so that it can be reattached
+                     to the child process.
+    """
+    from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
+    # Re-open stdin.
+    if stdin_fileno is not None:
+        sys.stdin = os.fdopen(stdin_fileno)
+
+    # Logging needs to be setup again for each child.
+    config.configure_logging()
+
+    # Now we can call into `Server.run(sockets=sockets)`
+    target(sockets=sockets)
+```
+
+### Run below command to use Opentelemetry autoinstrumentation
+```
+opentelemetry-instrument langchain serve
+```
