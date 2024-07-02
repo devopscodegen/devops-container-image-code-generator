@@ -35,11 +35,21 @@ to update the generated container image code.
 
 """
 
+import importlib
+import os
 from devops_code_generator.git_source_code_repository import GitSourceCodeRepository
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
+
+
+def import_module(name, path):
+    """
+    This function dynamically imports a Python module from a given file path.
+    """
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def runnable_fnd_lang_dep_mfst_dep_mgmt_tool(text: str):
@@ -61,6 +71,45 @@ def runnable_fnd_lang_dep_mfst_dep_mgmt_tool(text: str):
     }
 
 
+def route_to_find_middleware_chain(info: dict):
+    """
+    Routing function which returns the find_middleware_chain
+    corresponding to the language and dependency management tool
+    """
+    module_name = "find_middleware_chain_module"
+    module_path = os.path.join(
+        "app",
+        "chains",
+        "find_middleware_chains",
+        info["language"],
+        info["dependency_management_tool"],
+        "chain.py",
+    )
+    find_middleware_chain_module = import_module(name=module_name, path=module_path)
+    return find_middleware_chain_module.get_chain(llm)
+
+
+def route_to_generate_container_image_code_chain(info: dict):
+    """
+    Routing function which returns the generate_container_image_code_chain
+    corresponding to the middleware returned by find_middleware_chain
+    """
+    module_name = "generate_container_image_code_chain_module"
+    module_path = os.path.join(
+        "app",
+        "chains",
+        "generate_container_image_code_chains",
+        info["language"],
+        info["dependency_management_tool"],
+        info["middleware"],
+        "chain.py",
+    )
+    generate_container_image_code_chain_module = import_module(
+        name=module_name, path=module_path
+    )
+    return generate_container_image_code_chain_module.get_chain(llm)
+
+
 llm = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
@@ -68,162 +117,6 @@ llm = ChatOpenAI(
     timeout=None,
     max_retries=2,
 )
-
-find_middleware_chain = {}
-find_middleware_chain["java"] = {}
-find_middleware_chain["java"]["apache_maven"] = (
-    ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "",
-            ),
-            (
-                "human",
-                """{dependency_manifest_content}
-
-For above {dependency_manifest}, select the correct {language} middleware out of the below
-- apache_tomcat
-- apache_tomee
-- eclipse_glassfish
-- eclipse_jakarta
-- eclipse_jetty
-- ibm_openliberty
-- ibm_redhat_jboss
-- ibm_redhat_quarkus
-- ibm_redhat_wildfly
-- ibm_websphere_liberty
-- ibm_websphere_traditional
-- oracle_weblogic
-- spring_boot_version_2.3.0_and_above
-- spring_boot_version_less_than_2.3.0
-
-If more than one middleware are possible, then select the most specific instead of the most generic.
-Specify the middleware and nothing else""",
-            ),
-        ]
-    )
-    | llm
-    | StrOutputParser()
-)
-
-
-def route_to_find_middleware_chain(info: str):
-    """
-    Routing function which returns the find_middleware_chain
-    corresponding to the language and dependency management tool returned by find_middleware_chain
-    """
-    return find_middleware_chain[info["language"]][info["dependency_management_tool"]]
-
-
-generate_container_image_code_chain = {}
-generate_container_image_code_chain["java"] = {}
-generate_container_image_code_chain["java"]["apache_maven"] = {}
-generate_container_image_code_chain["java"]["apache_maven"][
-    "spring_boot_version_2.3.0_and_above"
-] = (
-    ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "",
-            ),
-            (
-                "human",
-                """{dependency_manifest_content}
-
-For above {dependency_manifest}, use the below Dockerfile template to generate the Dockerfile.
-Make the changes required by the {dependency_manifest}. Generate the Dockerfile and nothing else.
-
-FROM eclipse-temurin:21-jdk-jammy as extract
-
-VOLUME /tmp
-
-ARG GID=10001
-ARG APPGROUPNAME=appgroup
-ARG UID=10001
-ARG APPUSERNAME=appuser
-ARG APPDIR=/app
-ARG APPEXTRACTDIR=$APPDIR/extracted
-ARG APPJAR=app.jar
-
-RUN addgroup --gid "${{GID}}" "${{APPGROUPNAME}}" \
-&& adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${{UID}}" \
-    --gid "${{GID}}" \
-    "${{APPUSERNAME}}" \
-&& mkdir -m 700 -p "${{APPDIR}}" "${{APPEXTRACTDIR}}" \
-&& chown "${{APPUSERNAME}}:${{APPGROUPNAME}}" "${{APPDIR}}" "${{APPEXTRACTDIR}}"
-
-USER $APPUSERNAME:$APPGROUPNAME
-
-WORKDIR $APPDIR
-
-COPY --chown=$APPUSERNAME:$APPGROUPNAME container_image/${{APPJAR}} ./
-
-RUN java -Djarmode=layertools -jar "${{APPJAR}}" extract --destination "${{APPEXTRACTDIR}}"
-
-FROM eclipse-temurin:21-jre-jammy AS final
-
-VOLUME /tmp
-
-ARG GID=10001
-ARG APPGROUPNAME=appgroup
-ARG UID=10001
-ARG APPUSERNAME=appuser
-ARG APPDIR=/app
-ARG APPEXTRACTDIR=$APPDIR/extracted
-ARG APPENTRYPOINT=entrypoint.sh
-
-RUN addgroup --gid "${{GID}}" "${{APPGROUPNAME}}" \
-&& adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${{UID}}" \
-    --gid "${{GID}}" \
-    "${{APPUSERNAME}}" \
-&& mkdir -m 700 -p "${{APPDIR}}" \
-&& chown "${{APPUSERNAME}}:${{APPGROUPNAME}}" "${{APPDIR}}"
-
-USER $APPUSERNAME:$APPGROUPNAME
-
-WORKDIR $APPDIR
-
-COPY --chown=$APPUSERNAME:$APPGROUPNAME --chmod=700 container_image/$APPENTRYPOINT ./
-
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/dependencies/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/spring-boot-loader/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/snapshot-dependencies/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/application/ ./
-
-EXPOSE 8080
-
-ENTRYPOINT ["/app/entrypoint.sh"]""",
-            ),
-        ]
-    )
-    | llm
-    | StrOutputParser()
-)
-
-
-def route_to_generate_container_image_code_chain(info):
-    """
-    Routing function which returns the generate_container_image_code_chain
-    corresponding to the middleware returned by find_middleware_chain
-    """
-    return generate_container_image_code_chain[info["language"]][
-        info["dependency_management_tool"]
-    ][info["middleware"]]
-
 
 chain = (
     RunnableLambda(runnable_fnd_lang_dep_mfst_dep_mgmt_tool)
