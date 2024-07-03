@@ -34,15 +34,26 @@ Currently only works for below constraints
 
 ## Environment Setup
 
-It uses OpenAI gpt-4o Model. Set the `OPENAI_API_KEY` environment variable to access the OpenAI models.
+Set the following environment variable to access OpenAI GPT4-o model
+```shell
+OPENAI_API_KEY='XXX'
+```
+
+Set the following environment variable to change the logging level from default WARNING to INFO
+```shell
+DEVOPS_CONTAINER_IMAGE_CODE_GENERATOR_LOG_LEVEL=info
+```
+
 System Git should have access to the input git source code repository.
 
 ## Usage
 
-To use this package, you should first have the LangChain CLI installed:
+To use this package, first install poetry ( python dependency management tool which internally uses pip )
+
+Then run the following command to install required dependencies
 
 ```shell
-pip install -U langchain-cli
+poetry install --with dev
 ```
 
 Then spin up a LangServe instance directly by:
@@ -65,14 +76,28 @@ from langserve.client import RemoteRunnable
 runnable = RemoteRunnable("http://127.0.0.1:8000")
 ```
 
-## Opentelemetry
+## Opentelemetry autoinstrumentation (Traces, Metrics and Logs)
 
-### Workaround for Opentelemetry autoinstrumentation to work with uvicorn
-https://github.com/open-telemetry/opentelemetry-python-contrib/issues/385#issuecomment-808794045
+### Set the following environment variables to use Opentelemetry autoinstrumentation
+
+```shell
+OTEL_SERVICE_NAME='devops-container-image-code-generator:<version>'
+OTEL_TRACES_EXPORTER=console
+OTEL_METRICS_EXPORTER=console
+OTEL_LOGS_EXPORTER=console
+OTEL_PYTHON_EXCLUDED_URLS="client/.*/info,healthcheck"
+OTEL_PYTHON_LOG_CORRELATION=true
+OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
+OTEL_PYTHON_DISABLED_INSTRUMENTATIONS="asyncio"
+OTEL_PYTHON_LOG_LEVEL=${DEVOPS_CONTAINER_IMAGE_CODE_GENERATOR_LOG_LEVEL}
+```
+
+### Apply the below Workaround for Opentelemetry autoinstrumentation to work with uvicorn
 
 Add below code as first line after documentation in the function subprocess_started in file site-packages/uvicorn/_subprocess.py
 ```
-from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
+    if os.getenv('OTEL_SERVICE_NAME'):
+        from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
 ```
 For Example :
 ```
@@ -93,7 +118,8 @@ def subprocess_started(
     * stdin_fileno - The file number of sys.stdin, so that it can be reattached
                      to the child process.
     """
-    from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
+    if os.getenv('OTEL_SERVICE_NAME'):
+        from opentelemetry.instrumentation.auto_instrumentation import sitecustomize
     # Re-open stdin.
     if stdin_fileno is not None:
         sys.stdin = os.fdopen(stdin_fileno)
@@ -106,6 +132,11 @@ def subprocess_started(
 ```
 
 ### Run below command to use Opentelemetry autoinstrumentation
-```
+```shell
 opentelemetry-instrument langchain serve
+```
+
+### Run below command if environment variable OTEL_SERVICE_NAME is set and you do not want to use Opentelemetey autoinstrumentation
+```shell
+OTEL_SERVICE_NAME= langchain serve
 ```
