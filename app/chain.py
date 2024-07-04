@@ -1,6 +1,6 @@
 """
 This module utilizes source code repository files, such as dependency manifests,
-to generate container image code like Dockerfile and entrypoint shell script using LangChain GenAI.
+to generate container image code like Dockerfile and entrypoint script using LangChain GenAI.
 
 # Approach
 - Developers write source code, unit test code,
@@ -14,7 +14,7 @@ from the dependency manifest checked into the source code repository
 to identify the middleware from the dependency manifest
 - It then uses routing function to route to the langchain genai subchain
 corresponding to the identified middleware
-to generate container image code like Dockerfile and entrypoint shell script
+to generate container image code like Dockerfile and entrypoint script
 for the source code repository.
 
 This approach shall be used to generate other DevOps code
@@ -95,13 +95,21 @@ def route_to_generate_container_image_code_chain(info: dict):
     corresponding to the middleware returned by find_middleware_chain
     """
     module_name = "generate_container_image_code_chain_module"
+    middleware = info.get("middleware")
+    if isinstance(middleware, dict):
+        if "middleware" in middleware:
+            middleware = middleware["middleware"]
+        else:
+            raise KeyError(
+                f"middleware key is missing in input middleware dictionary {middleware}"
+            )
     module_path = os.path.join(
         "app",
         "chains",
         "generate_container_image_code_chains",
         info["language"],
         info["dependency_management_tool"],
-        info["middleware"],
+        middleware,
         "chain.py",
     )
     generate_container_image_code_chain_module = import_module(

@@ -11,13 +11,13 @@
 
 # devops-container-image-code-generator
 
-Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint shell script using LangChain GenAI.
+Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script using LangChain GenAI.
 
 ## Approach
 - Developers write source code, unit test code, dependency manifests like pom.xml, package.json, requirements.txt and static assets on their machine and checkin to the source code repository
 - devops-container-image-code-generator uses devops-code-generator package to checkout the source code repository and identify language, dependency manifest and dependency management tool from the dependency manifest checked into the source code repository
 - It then uses langchain genai middleware chain to identify the middleware from the dependency manifest
-- It then uses routing function to route to the langchain genai subchain corresponding to the identified middleware to generate container image code like Dockerfile and entrypoint shell script for the source code repository.
+- It then uses routing function to route to the langchain genai subchain corresponding to the identified middleware to generate container image code like Dockerfile and entrypoint script for the source code repository.
 
 This approach shall be used to generate other DevOps code like pipeline code, infrastructure code, database code, deployment code, container deployment code, etc.
 
@@ -140,3 +140,34 @@ opentelemetry-instrument langchain serve
 ```shell
 OTEL_SERVICE_NAME= langchain serve
 ```
+
+## OpenAI GPT4-o Prompt Engineering Tactics
+
+| Tactic | Status | Comment |
+| --- | --- | --- |
+| Include details in your query to get more relevant answers | Done | Added complete instructions like "Generate the Dockerfile and entrypoint script and nothing else." so that model does not guess what we mean |
+| Ask the model to adopt a persona | Done | Added system message |
+| Use delimiters to clearly indicate distinct parts of the input | Done | All provided templates are delimited with \`\`\`_begin and \`\`\`_end
+| Specify the steps required to complete a task | Done | Used Langchain chain to divide the task of generating Dockerfile and entrypoint script into 2 steps 1. Find Middleware 2. Generate Dockerfile and entrypoint script |
+| Provide examples | To do | Not provided |
+| Specify the desired length of the output | Not required | Reason - we need the model to generate complete Dockerfile and entrypoint script from the template. |
+| Instruct the model to answer using a reference text | Done | Provided templates for Dockerfile and entrypoint script |
+| Instruct the model to answer with citations from a reference text | Not required | Reason - we need the model to only generate Dockerfile and entrypoint script from the template. |
+Use intent classification to identify the most relevant instructions for a user query | Done | Used Langchain chain to divide the task of generating Dockerfile and entrypoint script into 2 steps 1. Find Middleware 2. Generate Dockerfile and entrypoint script |
+| For dialogue applications that require very long conversations, summarize or filter previous dialogue | Not required | Reason - we are not creating a dialogue application as of now. |
+| Summarize long documents piecewise and construct a full summary recursively | To do | Need to check whether we need to provide other files to the model to improve the generated Dockerfile and entrypoint script. |
+| Instruct the model to work out its own solution before rushing to a conclusion | Not required | Reason - we are not checking any solution |
+| Use inner monologue or a sequence of queries to hide the model's reasoning process | Done | Added following lines to the prompt. Before selecting the middleware, generate a plan which explains your thinking. Before generating the Dockerfile and entrypoint script, generate a plan which explains your thinking. Plan should be delimited with \`\`\`plan_begin and \`\`\`plan_end. |
+| Ask the model if it missed anything on previous passes | To do | Need to check if we need to add this to the chain
+| Use embeddings-based search to implement efficient knowledge retrieval | To do |
+| Use code execution to perform more accurate calculations or call external APIs | To do |
+| Give the model access to specific functions | To do | Need to call Dockerfile and entrypoint script linting to check if there are any problems in the generated files. If there are then provide the errors to the chain and regenerate the Dockerfile and entrypoint script. RetryOutputParser |
+| Evaluate model outputs with reference to gold-standard answers | To do | Need to add test cases and use another LLM chain to evaluate if the generated Dockerfile and entrypoint_script matches the expected test output |
+
+## Design Notes
+- \`\`\` cannot be used as end delimiter by itself since it will need to be escaped if it is part of the actual generated text.
+- PydanticOutputParser cannot be used since it does not support streaming which is required in playground (astream_log)
+- JsonOutputParser cannot be used because we will have to escape ""
+- Created DevopsCodeGeneratorOutputParser Custom Output Parser. Copy of JsonOutputParser like base class is BaseCumulativeTransformOutputParser.
+- Use existing langchain code as template instead of just using the documentation which may not be updated
+- Used .partial method of ChatPromptTemplate to create middlewares markdown string from MIDDLEWARES list.
