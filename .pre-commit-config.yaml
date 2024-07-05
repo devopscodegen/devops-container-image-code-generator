@@ -25,6 +25,7 @@ repos:
   - id: check-json
   - id: check-shebang-scripts-are-executable
   - id: pretty-format-json
+    args: ["--autofix"]
   - id: check-merge-conflict
   - id: check-symlinks
   - id: check-toml

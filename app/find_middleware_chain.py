@@ -3,47 +3,44 @@ This module contains the get_chain function which
 returns the find_middleware_chain corresponding to the language and dependency management tool
 """
 
+import os
 from devops_code_generator.devops_code_generator_output_parser import (
     DevopsCodeGeneratorOutputParser,
 )
 from langchain_core.prompts import ChatPromptTemplate
 
-MIDDLEWARES = [
-    "apache_tomcat",
-    "apache_tomee",
-    "eclipse_glassfish",
-    "eclipse_jakarta",
-    "eclipse_jetty",
-    "ibm_openliberty",
-    "ibm_redhat_jboss",
-    "ibm_redhat_quarkus",
-    "ibm_redhat_wildfly",
-    "ibm_websphere_liberty",
-    "ibm_websphere_traditional",
-    "oracle_weblogic",
-    "spring_boot_version_2.3.0_and_above",
-    "spring_boot_version_less_than_2.3.0",
-]
 
-
-def get_chain(llm):
+def get_chain(llm, language, dependency_management_tool):
     """
     This function returns the find_middleware_chain
     corresponding to the language and dependency management tool
     """
+
+    # pylint: disable=R0801
+    middlewares_path = os.path.join(
+        "app", "chains", "find_middleware_chains", language, dependency_management_tool
+    )
+
+    with open(
+        file=os.path.join(middlewares_path, "middlewares.txt"),
+        mode="r",
+        encoding="utf-8",
+    ) as file:
+        middlewares = file.read()
+
     return (
         ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
                     """You will be provided with below information
-- contents of dependency manifest {dependency_manifest} delimited with ```{dependency_manifest}_begin and ```{dependency_manifest}_end.
-- {language} middlewares delimited with ```middlewares_begin and ```middlewares_end.
+- contents of dependency manifest {dependency_manifest} enclosed within ```{dependency_manifest}_begin and ```{dependency_manifest}_end delimiters.
+- {language} middlewares enclosed within ```middlewares_begin and ```middlewares_end delimiters.
 Your task is to select the correct middleware using only the provided information.
-Middleware should be delimited with ```middleware_begin and ```middleware_end.
+Middleware should be enclosed within ```middleware_begin and ```middleware_end delimiters.
 If more than one {language} middleware are possible, then select the most specific instead of the most generic.
-Before selecting the middleware, generate a plan which explains your thinking.
-Plan should be delimited with ```plan_begin and ```plan_end.
+Before selecting the middleware, explain your reasoning.
+Your reasoning should be enclosed within ```reasoning_begin and ```reasoning_end delimiters.
 """,
                 ),
                 (
@@ -58,9 +55,7 @@ Plan should be delimited with ```plan_begin and ```plan_end.
 """,
                 ),
             ]
-        ).partial(
-            middlewares="\n".join(f"- {middleware}" for middleware in MIDDLEWARES)
-        )
+        ).partial(middlewares=middlewares)
         | llm
         | DevopsCodeGeneratorOutputParser()
     )

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd /app
+
+exec java ${JAVA_OPTS} -cp .:./lib/* com.example.spring_boot_docker.SpringBootDockerApplication ${@}

@@ -11,7 +11,7 @@
 
 # devops-container-image-code-generator
 
-Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script using LangChain GenAI.
+GenAI Application which uses Langchain and source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script.
 
 ## Approach
 - Developers write source code, unit test code, dependency manifests like pom.xml, package.json, requirements.txt and static assets on their machine and checkin to the source code repository
@@ -48,31 +48,19 @@ System Git should have access to the input git source code repository.
 
 ## Usage
 
-To use this package, first install poetry ( python dependency management tool which internally uses pip )
+To test this application, do the following steps
 
-Then run the following command to install required dependencies
-
-```shell
-poetry install --with dev
-```
-
-Then spin up a LangServe instance directly by:
-
-```shell
-langchain serve
-```
-
-This will start the FastAPI app with a server is running locally at
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
-
-We can see all openapi specification at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-We can access the playground at [http://127.0.0.1:8000/playground](http://127.0.0.1:8000/playground)
-
-We can access the api from code with:
-
+- Install poetry ( python dependency management tool which internally uses pip ) using [https://python-poetry.org/docs/#installing-with-the-official-installer](https://python-poetry.org/docs/#installing-with-the-official-installer)
+- Clone the git repository.
+- Run command ```poetry install --with dev``` to install required dependencies.
+- Run command ```OTEL_SERVICE_NAME= langchain serve``` to start the application.
+- Open playground in Browser at [http://127.0.0.1:8000/devops-container-image-code-generator/playground/](http://127.0.0.1:8000/devops-container-image-code-generator/playground/) and provide ```https://github.com/spring-projects/spring-petclinic``` as input.
+ It will output the reasoning, Dockerfile and entrypoint script for this spring boot middleware application component. You can click on Intermediate Steps to check the intermediate steps taken by the Langchain chain.
+- Again Open playground at [http://127.0.0.1:8000/devops-container-image-code-generator/playground/](http://127.0.0.1:8000/devops-container-image-code-generator/playground/) and provide ```https://github.com/spring-petclinic/spring-framework-petclinic```as input. It will output the reasoning and Dockerfile for this apache tomcat middleware application component. You can click on Intermediate Steps to check the intermediate steps taken by the Langchain chain.
+- Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in browser to try all OpenAPI specifications
+- Access the api from code with:
 ```python
 from langserve.client import RemoteRunnable
-
 runnable = RemoteRunnable("http://127.0.0.1:8000")
 ```
 

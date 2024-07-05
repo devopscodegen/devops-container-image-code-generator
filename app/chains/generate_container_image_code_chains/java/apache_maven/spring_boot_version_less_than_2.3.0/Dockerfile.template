@@ -1,0 +1,71 @@
+FROM eclipse-temurin:21-jdk-jammy as extract
+
+VOLUME /tmp
+
+ARG GID=10001
+ARG APPGROUPNAME=appgroup
+ARG UID=10001
+ARG APPUSERNAME=appuser
+ARG APPDIR=/app
+ARG APPEXTRACTDIR=$APPDIR/extracted
+ARG APPJAR=app.jar
+
+RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
+&& adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    --gid "${GID}" \
+    "${APPUSERNAME}" \
+&& mkdir -m 700 -p "${APPDIR}" "${APPEXTRACTDIR}" \
+&& chown "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}" "${APPEXTRACTDIR}"
+
+USER $APPUSERNAME:$APPGROUPNAME
+
+WORKDIR $APPDIR
+
+COPY --chown=$APPUSERNAME:$APPGROUPNAME container_image/${APPJAR} ./
+
+RUN cd "${APPEXTRACTDIR}" && jar -xf "${APPDIR}/${APPJAR}"
+
+FROM eclipse-temurin:21-jre-jammy AS final
+
+VOLUME /tmp
+
+ARG GID=10001
+ARG APPGROUPNAME=appgroup
+ARG UID=10001
+ARG APPUSERNAME=appuser
+ARG APPDIR=/app
+ARG APPEXTRACTDIR=$APPDIR/extracted
+ARG APPENTRYPOINT=entrypoint.sh
+
+RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
+&& adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    --gid "${GID}" \
+    "${APPUSERNAME}" \
+&& mkdir -m 700 -p "${APPDIR}" \
+&& chown "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}"
+
+USER $APPUSERNAME:$APPGROUPNAME
+
+WORKDIR $APPDIR
+
+COPY --chown=$APPUSERNAME:$APPGROUPNAME --chmod=700 container_image/$APPENTRYPOINT ./
+
+COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/BOOT-INF/lib ./lib
+COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/META-INF ./META-INF
+COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/BOOT-INF/classes ./
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app/entrypoint.sh"]

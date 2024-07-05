@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd /app
+
+exec java ${JAVA_OPTS} org.springframework.boot.loader.launch.JarLauncher ${@}

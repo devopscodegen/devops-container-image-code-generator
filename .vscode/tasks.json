@@ -1,0 +1,25 @@
+{
+  "tasks": [
+    {
+      "command": "OTEL_SERVICE_NAME= langchain serve",
+      "group": {
+        "isDefault": true,
+        "kind": "build"
+      },
+      "label": "Run without opentelemetry",
+      "problemMatcher": [],
+      "type": "shell"
+    },
+    {
+      "command": "opentelemetry-instrument langchain serve",
+      "group": {
+        "isDefault": false,
+        "kind": "build"
+      },
+      "label": "Run with opentelemetry",
+      "problemMatcher": [],
+      "type": "shell"
+    }
+  ],
+  "version": "2.0.0"
+}

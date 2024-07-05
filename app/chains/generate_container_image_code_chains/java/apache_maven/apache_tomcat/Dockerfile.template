@@ -1,0 +1,75 @@
+FROM eclipse-temurin:21-jdk-jammy as extract
+
+VOLUME /tmp
+
+ARG GID=10001
+ARG APPGROUPNAME=appgroup
+ARG UID=10001
+ARG APPUSERNAME=appuser
+ARG APPDIR=/app
+ARG APPEXTRACTDIR=$APPDIR/extracted
+ARG APPNAME=app
+ARG APPWAR=$APPNAME.war
+ENV CATALINA_BASE=$APPDIR
+
+RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
+&& adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    --gid "${GID}" \
+    "${APPUSERNAME}" \
+&& mkdir -m 700 -p "${APPDIR}" "${APPEXTRACTDIR}" \
+&& chown "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}" "${APPEXTRACTDIR}"
+
+USER $APPUSERNAME:$APPGROUPNAME
+
+WORKDIR $APPDIR
+
+COPY --chown=$APPUSERNAME:$APPGROUPNAME container_image/${APPWAR} ./
+
+RUN cd "${APPEXTRACTDIR}" && jar -xf "${APPDIR}/${APPWAR}"
+
+FROM tomcat:10-jre21 AS final
+
+VOLUME /tmp
+
+ARG GID=10001
+ARG APPGROUPNAME=appgroup
+ARG UID=10001
+ARG APPUSERNAME=appuser
+ARG APPDIR=/app
+ARG APPEXTRACTDIR=$APPDIR/extracted
+ARG APPENTRYPOINT=entrypoint.sh
+ENV CATALINA_BASE=$APPDIR
+ARG APPNAME=app
+
+RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
+&& adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    --gid "${GID}" \
+    "${APPUSERNAME}" \
+&& mkdir -m 700 -p "${APPDIR}" \
+&& cd "${APPDIR}" \
+&& mkdir -m 700 -p bin lib "webapps/${APPNAME}" work temp logs \
+&& cp -Rfp $CATALINA_HOME/conf ./ \
+&& chown -R "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}"
+
+USER $APPUSERNAME:$APPGROUPNAME
+
+WORKDIR $APPDIR
+
+COPY --chown=$APPUSERNAME:$APPGROUPNAME tomcat/lib/ ./lib/
+COPY --chown=$APPUSERNAME:$APPGROUPNAME tomcat/bin/ ./bin/
+COPY --chown=$APPUSERNAME:$APPGROUPNAME tomcat/conf/ ./conf/
+COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/ ./webapps/$APPNAME/
+
+EXPOSE 8080

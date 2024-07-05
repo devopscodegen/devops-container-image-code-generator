@@ -40,6 +40,12 @@ import os
 from devops_code_generator.git_source_code_repository import GitSourceCodeRepository
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
+from app.find_middleware_chain import (
+    get_chain as find_middleware_chain_module_get_chain,
+)
+from app.generate_container_image_code_chain import (
+    get_chain as generate_container_image_code_chain_module_get_chain,
+)
 
 
 def import_module(name, path):
@@ -76,17 +82,30 @@ def route_to_find_middleware_chain(info: dict):
     Routing function which returns the find_middleware_chain
     corresponding to the language and dependency management tool
     """
+    language = info["language"]
+    dependency_management_tool = info["dependency_management_tool"]
     module_name = "find_middleware_chain_module"
+    # pylint: disable=R0801
     module_path = os.path.join(
         "app",
         "chains",
         "find_middleware_chains",
-        info["language"],
-        info["dependency_management_tool"],
+        language,
+        dependency_management_tool,
         "chain.py",
     )
-    find_middleware_chain_module = import_module(name=module_name, path=module_path)
-    return find_middleware_chain_module.get_chain(llm)
+    if os.path.isfile(module_path):
+        find_middleware_chain_module = import_module(name=module_name, path=module_path)
+        return find_middleware_chain_module.get_chain(
+            llm=llm,
+            language=language,
+            dependency_management_tool=dependency_management_tool,
+        )
+    return find_middleware_chain_module_get_chain(
+        llm=llm,
+        language=language,
+        dependency_management_tool=dependency_management_tool,
+    )
 
 
 def route_to_generate_container_image_code_chain(info: dict):
@@ -94,6 +113,8 @@ def route_to_generate_container_image_code_chain(info: dict):
     Routing function which returns the generate_container_image_code_chain
     corresponding to the middleware returned by find_middleware_chain
     """
+    language = info["language"]
+    dependency_management_tool = info["dependency_management_tool"]
     module_name = "generate_container_image_code_chain_module"
     middleware = info.get("middleware")
     if isinstance(middleware, dict):
@@ -103,19 +124,27 @@ def route_to_generate_container_image_code_chain(info: dict):
             raise KeyError(
                 f"middleware key is missing in input middleware dictionary {middleware}"
             )
+    # pylint: disable=R0801
     module_path = os.path.join(
         "app",
         "chains",
         "generate_container_image_code_chains",
-        info["language"],
-        info["dependency_management_tool"],
+        language,
+        dependency_management_tool,
         middleware,
         "chain.py",
     )
-    generate_container_image_code_chain_module = import_module(
-        name=module_name, path=module_path
+    if os.path.isfile(module_path):
+        generate_container_image_code_chain_module = import_module(
+            name=module_name, path=module_path
+        )
+        return generate_container_image_code_chain_module.get_chain(llm)
+    return generate_container_image_code_chain_module_get_chain(
+        llm=llm,
+        language=language,
+        dependency_management_tool=dependency_management_tool,
+        middleware=middleware,
     )
-    return generate_container_image_code_chain_module.get_chain(llm)
 
 
 llm = ChatOpenAI(
