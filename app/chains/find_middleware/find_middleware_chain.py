@@ -1,5 +1,5 @@
 """
-This module contains the get_chain function which
+This module contains the create_find_middleware_chain function which
 returns the find_middleware_chain corresponding to the language and dependency management tool
 """
 
@@ -10,7 +10,7 @@ from devops_code_generator.devops_code_generator_output_parser import (
 from langchain_core.prompts import ChatPromptTemplate
 
 
-def get_chain(llm, language, dependency_management_tool):
+def create_find_middleware_chain(llm, language, dependency_management_tool):
     """
     This function returns the find_middleware_chain
     corresponding to the language and dependency management tool
@@ -18,7 +18,7 @@ def get_chain(llm, language, dependency_management_tool):
 
     # pylint: disable=R0801
     middlewares_path = os.path.join(
-        "app", "chains", "find_middleware_chains", language, dependency_management_tool
+        "app", "templates", "find_middleware", language, dependency_management_tool
     )
 
     with open(
@@ -58,4 +58,4 @@ Your reasoning should be enclosed within ```reasoning_begin and ```reasoning_end
         ).partial(middlewares=middlewares)
         | llm
         | DevopsCodeGeneratorOutputParser()
-    )
+    ).with_config(run_name="find_middleware_chain")

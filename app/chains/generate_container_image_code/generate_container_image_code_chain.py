@@ -1,5 +1,5 @@
 """
-This module contains the get_chain function which
+This module contains the create_generate_container_image_code_chain function which
 returns the generate_container_image_code_chain
 corresponding to the middleware returned by find_middleware_chain
 """
@@ -9,7 +9,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 
-def get_chain(llm, language, dependency_management_tool, middleware):
+def create_generate_container_image_code_chain(
+    llm, language, dependency_management_tool, middleware
+):
     """
     This function returns the generate_container_image_code_chain
     corresponding to the middleware returned by find_middleware_chain
@@ -18,8 +20,8 @@ def get_chain(llm, language, dependency_management_tool, middleware):
     # pylint: disable=R0801
     templates_path = os.path.join(
         "app",
-        "chains",
-        "generate_container_image_code_chains",
+        "templates",
+        "generate_container_image_code",
         language,
         dependency_management_tool,
         middleware,
@@ -95,4 +97,4 @@ Your reasoning should be enclosed within ```reasoning_begin and ```reasoning_end
         )
         | llm
         | StrOutputParser()
-    )
+    ).with_config(run_name="generate_container_image_code_chain")

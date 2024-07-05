@@ -40,11 +40,9 @@ import os
 from devops_code_generator.git_source_code_repository import GitSourceCodeRepository
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
-from app.find_middleware_chain import (
-    get_chain as find_middleware_chain_module_get_chain,
-)
-from app.generate_container_image_code_chain import (
-    get_chain as generate_container_image_code_chain_module_get_chain,
+from app.chains.find_middleware import create_find_middleware_chain
+from app.chains.generate_container_image_code import (
+    create_generate_container_image_code_chain,
 )
 
 
@@ -89,19 +87,19 @@ def route_to_find_middleware_chain(info: dict):
     module_path = os.path.join(
         "app",
         "chains",
-        "find_middleware_chains",
+        "find_middleware",
         language,
         dependency_management_tool,
-        "chain.py",
+        "find_middleware_chain.py",
     )
     if os.path.isfile(module_path):
         find_middleware_chain_module = import_module(name=module_name, path=module_path)
-        return find_middleware_chain_module.get_chain(
+        return find_middleware_chain_module.create_find_middleware_chain(
             llm=llm,
             language=language,
             dependency_management_tool=dependency_management_tool,
         )
-    return find_middleware_chain_module_get_chain(
+    return create_find_middleware_chain(
         llm=llm,
         language=language,
         dependency_management_tool=dependency_management_tool,
@@ -128,18 +126,23 @@ def route_to_generate_container_image_code_chain(info: dict):
     module_path = os.path.join(
         "app",
         "chains",
-        "generate_container_image_code_chains",
+        "generate_container_image_code",
         language,
         dependency_management_tool,
         middleware,
-        "chain.py",
+        "generate_container_image_code_chain.py",
     )
     if os.path.isfile(module_path):
         generate_container_image_code_chain_module = import_module(
             name=module_name, path=module_path
         )
-        return generate_container_image_code_chain_module.get_chain(llm)
-    return generate_container_image_code_chain_module_get_chain(
+        return generate_container_image_code_chain_module.create_generate_container_image_code_chain(
+            llm=llm,
+            language=language,
+            dependency_management_tool=dependency_management_tool,
+            middleware=middleware,
+        )
+    return create_generate_container_image_code_chain(
         llm=llm,
         language=language,
         dependency_management_tool=dependency_management_tool,
@@ -156,9 +159,15 @@ llm = ChatOpenAI(
 )
 
 chain = (
-    RunnableLambda(runnable_fnd_lang_dep_mfst_dep_mgmt_tool)
-    | RunnablePassthrough.assign(
-        middleware=RunnableLambda(route_to_find_middleware_chain)
+    RunnableLambda(runnable_fnd_lang_dep_mfst_dep_mgmt_tool).with_config(
+        run_name="fnd_lang_dep_mfst_dep_mgmt_tool"
     )
-    | RunnableLambda(route_to_generate_container_image_code_chain)
+    | RunnablePassthrough.assign(
+        middleware=RunnableLambda(route_to_find_middleware_chain).with_config(
+            run_name="route_to_find_middleware_chain"
+        )
+    ).with_config(run_name="set_middleware")
+    | RunnableLambda(route_to_generate_container_image_code_chain).with_config(
+        run_name="route_to_generate_container_image_code_chain"
+    )
 )
