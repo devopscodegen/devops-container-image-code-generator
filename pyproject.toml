@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devops-container-image-code-generator"
-version = "1.20240705.1"
+version = "1.20240705.2"
 description = "Utilizes source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script using LangChain GenAI. "
 authors = ["Sagar Velankar <sagar.velankar@gmail.com>"]
 license = "MIT"
