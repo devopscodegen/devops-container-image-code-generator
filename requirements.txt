@@ -190,9 +190,9 @@ colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0" and platfo
 deprecated==1.2.14 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:6fac8b097794a90302bdbb17b9b815e732d3c4720583ff1b198499d78470466c \
     --hash=sha256:e5323eb936458dccc2582dc6f9c322c852a775a27065ff2b0c4970b9d53d01b3
-devops-code-generator==1.20240705.2 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:2cecbb97d9e968bddfb9b718a6914a3c5d3304857c0241ee92b708bdde0e87bd \
-    --hash=sha256:b8f85666dc7f2349ad830586390f271278ddac255396b5a5e5ce90f6260e4ca6
+devops-code-generator==1.20240705.3 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:32f114ca92a8c0da649aa208adc5e1928905d492630164cf9be4c91207f75e85 \
+    --hash=sha256:7450068c423ed160b6897039c13f12a4058f9ba250922b036ea7f9475a1dd2a8
 distro==1.9.0 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed \
     --hash=sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2

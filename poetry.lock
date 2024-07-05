@@ -396,13 +396,13 @@ GitPython = ">=3.1.43,<4.0.0"
 
 [[package]]
 name = "devops-code-generator"
-version = "1.20240705.2"
+version = "1.20240705.3"
 description = "Parent python package containing common python modules for all devops code generators like pipeline code generator, infrastructure code generator, database code generator, deployment code generator, container image code generator, container deployment code generator, etc."
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "devops_code_generator-1.20240705.2-py3-none-any.whl", hash = "sha256:b8f85666dc7f2349ad830586390f271278ddac255396b5a5e5ce90f6260e4ca6"},
-    {file = "devops_code_generator-1.20240705.2.tar.gz", hash = "sha256:2cecbb97d9e968bddfb9b718a6914a3c5d3304857c0241ee92b708bdde0e87bd"},
+    {file = "devops_code_generator-1.20240705.3-py3-none-any.whl", hash = "sha256:7450068c423ed160b6897039c13f12a4058f9ba250922b036ea7f9475a1dd2a8"},
+    {file = "devops_code_generator-1.20240705.3.tar.gz", hash = "sha256:32f114ca92a8c0da649aa208adc5e1928905d492630164cf9be4c91207f75e85"},
 ]
 
 [package.dependencies]
