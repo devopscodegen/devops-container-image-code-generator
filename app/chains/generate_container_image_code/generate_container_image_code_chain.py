@@ -56,6 +56,18 @@ def create_generate_container_image_code_chain(
             .replace("}", "}}")
         )
 
+    prompt_append_path = os.path.join(templates_path, "prompt_append.txt")
+
+    prompt_append = ""
+
+    if os.path.isfile(prompt_append_path):
+        with open(file=prompt_append_path, mode="r", encoding="utf-8") as file:
+            prompt_append = file.read()
+
+        prompt_append = (
+            prompt_append.replace("\\", "\\\\").replace("{", "{{").replace("}", "}}")
+        )
+
     return (
         ChatPromptTemplate.from_messages(
             [
@@ -73,6 +85,7 @@ This generated Dockerfile and entrypoint script will be used in the container im
 CI/CD pipeline will copy all the required build artifacts to the directories required by the Dockerfile and entrypoint script in the earlier stages.
 Before generating the Dockerfile and entrypoint script, explain your reasoning.
 Your reasoning should be enclosed within ```reasoning_begin and ```reasoning_end delimiters.
+{prompt_append}
 """,
                 ),
                 (
@@ -94,6 +107,7 @@ Your reasoning should be enclosed within ```reasoning_begin and ```reasoning_end
         ).partial(
             dockerfile_template=dockerfile_template,
             entrypoint_script_template=entrypoint_script_template,
+            prompt_append=prompt_append,
         )
         | llm
         | StrOutputParser()

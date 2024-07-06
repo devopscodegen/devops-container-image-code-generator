@@ -37,7 +37,7 @@ RUN cd "${APPEXTRACTDIR}" \
 && mv "${APPEXTRACTDIR}/${APPNAME}"/* ./ \
 && rm -rf "${APPEXTRACTDIR}/${APPNAME}"
 
-FROM python:3.11-slim AS final
+FROM python:3.11 AS final
 
 VOLUME /tmp
 
@@ -66,8 +66,6 @@ RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
 && chown "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}"
 
 WORKDIR $APPDIR
-
-COPY --from=extract /usr/bin/git /usr/bin/git
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
