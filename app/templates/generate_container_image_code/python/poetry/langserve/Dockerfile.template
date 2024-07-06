@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-jammy as extract
+FROM python:3.11 as extract
 
 VOLUME /tmp
 
@@ -9,8 +9,8 @@ ARG APPUSERNAME=appuser
 ARG APPDIR=/app
 ARG APPEXTRACTDIR=$APPDIR/extracted
 ARG APPNAME=app
-ARG APPJARDIR=target
-ARG APPJAR=$APPNAME.jar
+ARG APPWHEELDIR=dist
+ARG APPWHEEL=$APPNAME-py3-none-any.whl
 
 RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
 && adduser \
@@ -29,11 +29,15 @@ USER $APPUSERNAME:$APPGROUPNAME
 
 WORKDIR $APPDIR
 
-COPY --chown=$APPUSERNAME:$APPGROUPNAME ${APPJARDIR}/${APPJAR} ./
+COPY --chown=$APPUSERNAME:$APPGROUPNAME ${APPWHEELDIR}/${APPWHEEL} ./
 
-RUN java -Djarmode=layertools -jar "${APPJAR}" extract --destination "${APPEXTRACTDIR}"
+RUN cd "${APPEXTRACTDIR}" \
+&& wheel unpack "${APPDIR}/${APPWHEEL}" \
+&& rm -rf "${APPEXTRACTDIR}/${APPNAME}/${APPNAME}.dist-info" \
+&& mv "${APPEXTRACTDIR}/${APPNAME}"/* ./ \
+&& rm -rf "${APPEXTRACTDIR}/${APPNAME}"
 
-FROM eclipse-temurin:21-jre-jammy AS final
+FROM python:3.11-slim AS final
 
 VOLUME /tmp
 
@@ -45,6 +49,8 @@ ARG APPDIR=/app
 ARG APPEXTRACTDIR=$APPDIR/extracted
 ARG APPENTRYPOINT=entrypoint.sh
 ARG APPENTRYPOINTDIR=scripts
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
 && adduser \
@@ -59,17 +65,20 @@ RUN addgroup --gid "${GID}" "${APPGROUPNAME}" \
 && mkdir -m 700 -p "${APPDIR}" \
 && chown "${APPUSERNAME}:${APPGROUPNAME}" "${APPDIR}"
 
-USER $APPUSERNAME:$APPGROUPNAME
-
 WORKDIR $APPDIR
+
+COPY --from=extract /usr/bin/git /usr/bin/git
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    python -m pip install -r requirements.txt
+
+USER $APPUSERNAME:$APPGROUPNAME
 
 COPY --chown=$APPUSERNAME:$APPGROUPNAME --chmod=700 $APPENTRYPOINTDIR/$APPENTRYPOINT ./
 
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/dependencies/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/spring-boot-loader/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/snapshot-dependencies/ ./
-COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/application/ ./
+COPY --from=extract --chown=$APPUSERNAME:$APPGROUPNAME $APPEXTRACTDIR/ ./
 
-EXPOSE 8080
+EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]

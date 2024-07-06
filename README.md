@@ -21,14 +21,17 @@ GenAI Application which uses Langchain and source code repository files, such as
 
 This approach shall be used to generate other DevOps code like pipeline code, infrastructure code, database code, deployment code, container deployment code, etc.
 
-## Constraints
-Currently only works for below constraints
+## Templates
+Currently, templates exist for below language, dependency management tool and middleware combinations
 - language : java
-- dependency management tool : apache_maven
-- middleware : spring_boot_version_2.3.0_and_above middleware.
+    - dependency management tool : apache_maven
+        - middlewares : apache_tomcat, spring_boot_version_2.3.0_and_above and spring_boot_version_less_than_2.3.0
+- language : python
+    - dependency management tool : poetry
+        - middlewares : langserve
 
 ## Future Work
-- Add templates for other languages, dependency management tools and middlewares.
+- Add templates for other language, dependency management tool and middleware combinations.
 - Use other files in the source code repository like README.md, etc. to update the generated container image code.
 - Use low level design document and images to update the generated container image code.
 

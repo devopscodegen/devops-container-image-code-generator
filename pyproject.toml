@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devops-container-image-code-generator"
-version = "1.20240705.6"
+version = "1.20240705.7"
 description = "GenAI Application which uses Langchain and source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script."
 authors = ["Sagar Velankar <sagar.velankar@gmail.com>"]
 license = "MIT"
@@ -48,11 +48,11 @@ opentelemetry-instrumentation-urllib3 = "^0.46b0"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-langchain-cli = ">=0.0.15"
 pre-commit = "^3.7.1"
 pytest = "^8.2.2"
 black = "^24.4.2"
 pylint = "^3.2.3"
+langchain-cli = "^0.0.25"
 
 [build-system]
 requires = ["poetry-core"]
