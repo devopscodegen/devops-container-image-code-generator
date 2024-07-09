@@ -37,12 +37,14 @@ to update the generated container image code.
 
 import importlib
 import os
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_openai import ChatOpenAI
 from devops_code_generator_library.git_source_code_repository import (
     GitSourceCodeRepository,
 )
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_openai import ChatOpenAI
-from app.chains.find_middleware import create_find_middleware_chain
+from devops_code_generator_library.chains.find_middleware import (
+    create_find_middleware_chain,
+)
 from app.chains.generate_container_image_code import (
     create_generate_container_image_code_chain,
 )

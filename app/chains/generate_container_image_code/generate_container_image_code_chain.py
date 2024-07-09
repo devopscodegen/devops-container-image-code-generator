@@ -4,7 +4,7 @@ returns the generate_container_image_code_chain
 corresponding to the middleware returned by find_middleware_chain
 """
 
-import os
+from importlib.resources import files
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -17,56 +17,51 @@ def create_generate_container_image_code_chain(
     corresponding to the middleware returned by find_middleware_chain
     """
 
-    # pylint: disable=R0801
-    templates_path = os.path.join(
-        "app",
-        "templates",
-        "generate_container_image_code",
-        language,
-        dependency_management_tool,
-        middleware,
-    )
-
-    with open(
-        file=os.path.join(templates_path, "Dockerfile.template"),
-        mode="r",
-        encoding="utf-8",
-    ) as file:
-        dockerfile_template = file.read()
+    templates_package = "app.templates.generate_container_image_code"
 
     dockerfile_template = (
-        dockerfile_template.replace("\\", "\\\\").replace("{", "{{").replace("}", "}}")
-    )
-
-    entrypoint_script_template_path = os.path.join(
-        templates_path, "entrypoint_script.template"
+        files(templates_package)
+        .joinpath(
+            language, dependency_management_tool, middleware, "Dockerfile.template"
+        )
+        .read_text(encoding="utf-8")
+        .replace("\\", "\\\\")
+        .replace("{", "{{")
+        .replace("}", "}}")
     )
 
     entrypoint_script_template = ""
-
-    if os.path.isfile(entrypoint_script_template_path):
-        with open(
-            file=entrypoint_script_template_path, mode="r", encoding="utf-8"
-        ) as file:
-            entrypoint_script_template = file.read()
-
+    try:
         entrypoint_script_template = (
-            entrypoint_script_template.replace("\\", "\\\\")
+            files(templates_package)
+            .joinpath(
+                language,
+                dependency_management_tool,
+                middleware,
+                "entrypoint_script.template",
+            )
+            .read_text(encoding="utf-8")
+            .replace("\\", "\\\\")
             .replace("{", "{{")
             .replace("}", "}}")
         )
-
-    prompt_append_path = os.path.join(templates_path, "prompt_append.txt")
+    except FileNotFoundError:
+        print("Optional entrypoint script template not found.")
 
     prompt_append = ""
-
-    if os.path.isfile(prompt_append_path):
-        with open(file=prompt_append_path, mode="r", encoding="utf-8") as file:
-            prompt_append = file.read()
-
+    try:
         prompt_append = (
-            prompt_append.replace("\\", "\\\\").replace("{", "{{").replace("}", "}}")
+            files(templates_package)
+            .joinpath(
+                language, dependency_management_tool, middleware, "prompt_append.txt"
+            )
+            .read_text(encoding="utf-8")
+            .replace("\\", "\\\\")
+            .replace("{", "{{")
+            .replace("}", "}}")
         )
+    except FileNotFoundError:
+        print("Optional prompt append text file not found.")
 
     return (
         ChatPromptTemplate.from_messages(
