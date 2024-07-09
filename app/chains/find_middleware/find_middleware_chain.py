@@ -4,7 +4,7 @@ returns the find_middleware_chain corresponding to the language and dependency m
 """
 
 import os
-from devops_code_generator.devops_code_generator_output_parser import (
+from devops_code_generator_library.devops_code_generator_output_parser import (
     DevopsCodeGeneratorOutputParser,
 )
 from langchain_core.prompts import ChatPromptTemplate

@@ -15,7 +15,7 @@ GenAI Application which uses Langchain and source code repository files, such as
 
 ## Approach
 - Developers write source code, unit test code, dependency manifests like pom.xml, package.json, requirements.txt and static assets on their machine and checkin to the source code repository
-- devops-container-image-code-generator uses devops-code-generator package to checkout the source code repository and identify language, dependency manifest and dependency management tool from the dependency manifest checked into the source code repository
+- devops-container-image-code-generator uses devops-code-generator-library package to checkout the source code repository and identify language, dependency manifest and dependency management tool from the dependency manifest checked into the source code repository
 - It then uses langchain genai middleware chain to identify the middleware from the dependency manifest
 - It then uses routing function to route to the langchain genai subchain corresponding to the identified middleware to generate container image code like Dockerfile and entrypoint script for the source code repository.
 

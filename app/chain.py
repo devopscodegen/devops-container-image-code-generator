@@ -6,7 +6,7 @@ to generate container image code like Dockerfile and entrypoint script using Lan
 - Developers write source code, unit test code,
 dependency manifests like pom.xml, package.json, requirements.txt and static assets
 on their machine and checkin to the source code repository
-- devops-container-image-code-generator uses devops-code-generator package
+- devops-container-image-code-generator uses devops-code-generator-library package
 to checkout the source code repository
 and identify language, dependency manifest and dependency management tool
 from the dependency manifest checked into the source code repository
@@ -37,7 +37,9 @@ to update the generated container image code.
 
 import importlib
 import os
-from devops_code_generator.git_source_code_repository import GitSourceCodeRepository
+from devops_code_generator_library.git_source_code_repository import (
+    GitSourceCodeRepository,
+)
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from app.chains.find_middleware import create_find_middleware_chain

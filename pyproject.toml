@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devops-container-image-code-generator"
-version = "1.20240705.8"
+version = "1.20240705.9"
 description = "GenAI Application which uses Langchain and source code repository files, such as dependency manifests, to generate container image code like Dockerfile and entrypoint script."
 authors = ["Sagar Velankar <sagar.velankar@gmail.com>"]
 license = "MIT"
@@ -23,10 +23,8 @@ packages = [
 python = "^3.11"
 uvicorn = "^0.23.2"
 langserve = {extras = ["server"], version = ">=0.0.30"}
-pydantic = "<2"
 langchain-core = ">=0.1.5,<0.3"
 langchain-openai = ">=0.0.1"
-devops-code-generator = ">=1.0.0,<2.0.0"
 opentelemetry-distro = "^0.46b0"
 opentelemetry-exporter-otlp = "^1.25.0"
 opentelemetry-instrumentation-asyncio = "^0.46b0"
@@ -43,6 +41,7 @@ opentelemetry-instrumentation-httpx = "^0.46b0"
 opentelemetry-instrumentation-requests = "^0.46b0"
 opentelemetry-instrumentation-tortoiseorm = "^0.46b0"
 opentelemetry-instrumentation-urllib3 = "^0.46b0"
+devops-code-generator-library = "^1.20240709.1"
 
 [tool.poetry.group.dev]
 optional = true
