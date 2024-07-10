@@ -392,14 +392,14 @@ wrapt = ">=1.10,<2"
 dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "sphinx (<2)", "tox"]
 
 [[package]]
-name = "devops-code-generator-library"
-version = "1.20240709.3"
-description = "Library containing common python modules for all devops code generators like CI/CD pipeline code generator, infrastructure code generator, database code generator, virtual machine image code generator, deployment code generator, container image code generator, container deployment code generator, etc."
+name = "devopscodegen-common"
+version = "1.20240710.6"
+description = "Common python modules for all devops code generators like CI/CD pipeline code generator, infrastructure code generator, database code generator, virtual machine image code generator, deployment code generator, container image code generator, container deployment code generator, etc."
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "devops_code_generator_library-1.20240709.3-py3-none-any.whl", hash = "sha256:cec957647301a451f36fb0fddfd3664767dd0b5679f89de5c3ad0e7192accce0"},
-    {file = "devops_code_generator_library-1.20240709.3.tar.gz", hash = "sha256:9bbc65b9e88ef2b6612e3734c0467d8f7285329d92e7f367fb362d38578af72a"},
+    {file = "devopscodegen_common-1.20240710.6-py3-none-any.whl", hash = "sha256:ffebf607c305c87da109b74d9003c78424e3ab2b5a8bd705ff259f7318bfcfec"},
+    {file = "devopscodegen_common-1.20240710.6.tar.gz", hash = "sha256:69cf806ca193d7f645901fb93505a4791e1fc8bcba54291c65327f8cad9d1771"},
 ]
 
 [package.dependencies]
@@ -1322,13 +1322,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.35.10"
+version = "1.35.12"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.35.10-py3-none-any.whl", hash = "sha256:962cb5c23224b5cbd16078308dabab97a08b0a5ad736a4fdb3dc2ffc44ac974f"},
-    {file = "openai-1.35.10.tar.gz", hash = "sha256:85966949f4f960f3e4b239a659f9fd64d3a97ecc43c44dc0a044b5c7f11cccc6"},
+    {file = "openai-1.35.12-py3-none-any.whl", hash = "sha256:c3a8c9be524480ae32a3212b78d90786b112844eb8f96235ebb8bc5f35cb1e72"},
+    {file = "openai-1.35.12.tar.gz", hash = "sha256:2dd0f1d9ff34bf6bc89d15246245369d281b2ba01ae07eae5555a00da4b51e0b"},
 ]
 
 [package.dependencies]
@@ -2485,13 +2485,13 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "70.2.0"
+version = "70.3.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-70.2.0-py3-none-any.whl", hash = "sha256:b8b8060bb426838fbe942479c90296ce976249451118ef566a5a0b7d8b78fb05"},
-    {file = "setuptools-70.2.0.tar.gz", hash = "sha256:bd63e505105011b25c3c11f753f7e3b8465ea739efddaccef8f0efac2137bac1"},
+    {file = "setuptools-70.3.0-py3-none-any.whl", hash = "sha256:fe384da74336c398e0d956d1cae0669bc02eed936cdb1d49b57de1990dc11ffc"},
+    {file = "setuptools-70.3.0.tar.gz", hash = "sha256:f171bab1dfbc86b132997f26a119f6056a57950d058587841a0082e8830f9dc5"},
 ]
 
 [package.extras]
@@ -3065,4 +3065,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d730220c38104b234c18ba75af2b73fca1904bae665dcfaef02887d074cdb6b7"
+content-hash = "4424cd695b0b4420278cadf902da73809654a7bffb712671c367340372ba1475"

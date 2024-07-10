@@ -5,9 +5,9 @@
 [![PyPI - License](https://img.shields.io/pypi/l/devops-container-image-code-generator)]()
 [![PyPI - Status](https://img.shields.io/pypi/status/devops-container-image-code-generator)]()
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/devops-container-image-code-generator)]()
-[![GitHub Repo stars](https://img.shields.io/github/stars/devops-code-generators/devops-container-image-code-generator)
-](https://star-history.com/#devops-code-generators/devops-container-image-code-generator)
-[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/devops-code-generators/devops-container-image-code-generator)](https://github.com/devops-code-generators/devops-container-image-code-generator/issues)
+[![GitHub Repo stars](https://img.shields.io/github/stars/devopscodegen/devops-container-image-code-generator)
+](https://star-history.com/#devopscodegen/devops-container-image-code-generator)
+[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/devopscodegen/devops-container-image-code-generator)](https://github.com/devopscodegen/devops-container-image-code-generator/issues)
 
 # devops-container-image-code-generator
 
