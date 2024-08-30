@@ -19,6 +19,29 @@
       "label": "Run with opentelemetry",
       "problemMatcher": [],
       "type": "shell"
+    },
+    {
+      "command": "pnpm dev",
+      "group": {
+        "isDefault": true,
+        "kind": "build"
+      },
+      "label": "Start documentation website in development mode",
+      "options": {
+        "cwd": "docs"
+      },
+      "type": "shell"
+    },
+    {
+      "command": "pnpm i",
+      "group": {
+        "kind": "build"
+      },
+      "label": "Install dependencies for documentation website",
+      "options": {
+        "cwd": "docs"
+      },
+      "type": "shell"
     }
   ],
   "version": "2.0.0"

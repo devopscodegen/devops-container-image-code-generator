@@ -1,0 +1,27 @@
+{
+  "index": {
+    "type": "page",
+    "title": "DevOps container image code generator",
+    "display": "hidden",
+    "theme": {
+      "typesetting": "article"
+    }
+  },
+  "docs": {
+    "type": "page",
+    "title": "Documentation"
+  },
+  "contact": {
+    "title": "Contact ↗",
+    "type": "page",
+    "href": "https://discord.com/users/sagarvelankar/",
+    "newWindow": true
+  },
+  "404": {
+    "type": "page",
+    "theme": {
+      "timestamp": false,
+      "typesetting": "article"
+    }
+  }
+}

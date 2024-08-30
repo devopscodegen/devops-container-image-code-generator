@@ -1,0 +1,11 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
+import '../style.css';
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <Component {...pageProps} />
+      <GoogleAnalytics gaId="GTM-NF267TL6" />
+    </>
+  );
+}
